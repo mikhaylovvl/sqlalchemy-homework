@@ -23,7 +23,7 @@ class Book(Base):
     title = sq.Column(sq.String(length=40), unique=True, nullable=False)
     publisher_id = sq.Column(sq.Integer, sq.ForeignKey("publisher.id"), nullable=False)
 
-    publisher = relationship(Publisher, backref="book")
+    publisher = relationship(Publisher, backref="books")
 
 
 class Shop(Base):
@@ -31,6 +31,9 @@ class Shop(Base):
 
     id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(length=20), unique=True, nullable=False)
+
+    def __str__(self):
+        return f"Название магазина: {self.name}"
 
 
 class Stock(Base):
@@ -41,8 +44,8 @@ class Stock(Base):
     id_shop = sq.Column(sq.Integer, sq.ForeignKey("shop.id"), nullable=False)
     count = sq.Column(sq.Integer, CheckConstraint("count>=0"))
 
-    book = relationship(Book, backref="book_association")
-    shop = relationship(Shop, backref="shop_association")
+    book = relationship(Book, backref="stocks")
+    shop = relationship(Shop, backref="stocks")
 
 
 class Sale(Base):
@@ -54,9 +57,9 @@ class Sale(Base):
     id_stock = sq.Column(sq.Integer, sq.ForeignKey("stock.id"), nullable=False)
     count = sq.Column(sq.Integer, CheckConstraint("count > 0"))
 
-    stock = relationship(Stock, backref="stock_association")
+    stock = relationship(Stock, backref="sales")
 
 
-def create_tables(engine):
+def create_all_tables(engine):
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
